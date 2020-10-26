@@ -134,6 +134,17 @@ const user = {
       })
     })
   },
+  insert: (data) => {
+    return new Promise((resolve, reject) => {
+      db.query(`INSERT INTO users SET ?`, data, (err, res) => {
+        if (err) {
+          reject(new Error(err))
+        } else {
+          resolve(res)
+        }
+      })
+    })
+  },
   update: (data, id) => {
     return new Promise((resolve, reject) => {
       db.query(`UPDATE users SET ? WHERE id = ?`, [data, id], (err, result) => {
@@ -142,6 +153,17 @@ const user = {
           } else {
             resolve(result)
           }
+      })
+    })
+  },
+  destroy: (id) => {
+    return new Promise((resolve, reject) => {
+      db.query(`DELETE FROM users WHERE id = ?`, id, (err, res) => {
+        if (err) {
+          reject(new Error(err))
+        } else {
+          resolve(res)
+        }
       })
     })
   }

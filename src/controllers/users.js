@@ -19,7 +19,8 @@ const user = {
         email: body.email,
         password: hashPass,
         image: 'default.jpg',
-        active: 0
+        active: 0,
+        level: body.level
       }
       userModel.register(data).then(async (result) => {
 
@@ -90,10 +91,12 @@ const user = {
                 } else {
                   if (userRefreshToken === null) {
                     const id = results.id
+                    const level = results.level
                     const refreshToken = jwt.sign({ id }, REFRESHTOKEN)
                     userModel.updateRefreshToken(refreshToken, id).then(() => {
                       const data = {
                         id,
+                        level,
                         token,
                         refreshToken
                       }
@@ -104,6 +107,7 @@ const user = {
                   } else {
                     const data = {
                       id: results.id,
+                      level: results.level,
                       token,
                       refreshToken
                     }
@@ -239,6 +243,27 @@ const user = {
       failed(res, [], 'Internal Server Error')
     }
   },
+  insert: async (req, res) => {
+    try {
+      const body = req.body
+      const salt = await bcrypt.genSalt(10)
+      const hashPassword = await bcrypt.hash('123', salt)
+      const data = {
+        name: body.name,
+        email: body.email,
+        password: hashPassword,
+        image: 'default.jpg',
+        active: 0
+      }
+
+      userModel.insert(data)
+        .then((result) => {
+          success(res, result, "Insert Data Success")
+        }).catch((err) => failed(res, [], err.message))
+    } catch (error) {
+      failed(res, [], error.message)
+    }
+  },
   update: (req, res) => {
     try {
       upload.single('image')(req, res, (err) => {
@@ -277,15 +302,24 @@ const user = {
             } else {
               userModel.update(body, id).then((result) => {
                 success(res, result, 'Update success')
-              }).catch((err) => {
-                failed(res, [], err.message)
-              })
+              }).catch((err) => failed(res, [], err.message))
             }
           })
         }
       })
     } catch (error) {
       failed(res, [], 'Internal Server Error')
+    }
+  },
+  destroy: (req, res) => {
+    try {
+      const id = req.params.id
+      userModel.destroy(id)
+        .then((result) => {
+          success(res, result, "Delete data success")
+        }).catch((err) => failed(res, [], err.message))
+    } catch (error) {
+      failed(res, [], "Internal Server Error")
     }
   }
 }

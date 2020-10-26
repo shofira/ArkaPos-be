@@ -16,7 +16,7 @@ const upload = multer({
     if (file.originalname.match(/\.(png)\b/)) {
       cb(null, true)
     } else {
-      cb("File must be jpg or jpeg!", null)
+      cb("File must be png!", null)
     }
   }
 })
